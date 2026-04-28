@@ -4,6 +4,7 @@
 let video;
 let handPose;
 let hands = [];
+let bubbles = []; // 儲存水泡物件的陣列
 let statusMessage = "系統初始化中..."; // 用於顯示目前的狀態訊息
 
 function preload() {
@@ -51,6 +52,15 @@ function windowResized() {
 function draw() {
   // 3. 設定畫布的背景顏色為e7c6ff
   background('#e7c6ff');
+
+  // 在左上方加上文字內容
+  push();
+  fill(0);
+  noStroke();
+  textSize(24);
+  textAlign(LEFT, TOP);
+  text("414730530 陳宥縈", 20, 20);
+  pop();
 
   // 計算顯示影像的寬高 (畫布的50%)
   let displayVideoWidth = width * 0.5;
@@ -108,12 +118,30 @@ function draw() {
           }
         }
 
+        // 在指尖 (4, 8, 12, 16, 20) 產生水泡
+        let fingertips = [4, 8, 12, 16, 20];
+        for (let idx of fingertips) {
+          let pt = scaledPoints[idx];
+          bubbles.push(new Bubble(pt.x, pt.y));
+        }
+
         // 繪製關鍵點圓圈
         noStroke();
         for (let pt of scaledPoints) {
           circle(pt.x, pt.y, 12);
         }
       }
+    }
+  }
+
+  // 更新並顯示所有水泡
+  for (let i = bubbles.length - 1; i >= 0; i--) {
+    bubbles[i].update();
+    bubbles[i].show();
+    
+    // 如果水泡透明度變 0 (破掉) 或是超出螢幕上方，則移除
+    if (bubbles[i].isDone()) {
+      bubbles.splice(i, 1);
     }
   }
 
@@ -125,4 +153,31 @@ function draw() {
   textAlign(CENTER, CENTER);
   text(statusMessage, width / 2, height - 30);
   pop();
+}
+
+// 定義水泡類別
+class Bubble {
+  constructor(x, y) {
+    this.x = x + random(-5, 5); // 稍微隨機偏移，看起來更自然
+    this.y = y;
+    this.r = random(5, 15);     // 隨機大小
+    this.speed = random(1, 4);  // 上升速度
+    this.life = 255;            // 透明度，用來模擬生命週期
+  }
+
+  update() {
+    this.y -= this.speed;       // 往上移動
+    this.life -= 4;             // 逐漸變透明
+  }
+
+  show() {
+    stroke(255, this.life);     // 白色外框隨生命值變淡
+    strokeWeight(1);
+    noFill();
+    circle(this.x, this.y, this.r);
+  }
+
+  isDone() {
+    return this.life <= 0 || this.y < 0;
+  }
 }
