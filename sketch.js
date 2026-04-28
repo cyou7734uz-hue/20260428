@@ -93,15 +93,18 @@ function draw() {
           [9, 10, 11, 12],    // 中指
           [13, 14, 15, 16],   // 無名指
           [17, 18, 19, 20],   // 小指
-          [0, 5, 9, 13, 17, 0] // 手掌輪廓 (將手腕與各指根串接)
+          [0, 1, 5, 9, 13, 17, 0] // 改進的手掌輪廓 (手腕、大拇指根、各指根、連回手腕)
         ];
 
-        strokeWeight(2);
+        strokeWeight(5); // 增加線條粗細，讓連線在背景和影像上更明顯
         for (let seg of segments) {
           for (let i = 0; i < seg.length - 1; i++) {
             let p1 = scaledPoints[seg[i]];
             let p2 = scaledPoints[seg[i + 1]];
-            line(p1.x, p1.y, p2.x, p2.y);
+            // 確保關鍵點存在後再畫線
+            if (p1 && p2) {
+              line(p1.x, p1.y, p2.x, p2.y);
+            }
           }
         }
 
