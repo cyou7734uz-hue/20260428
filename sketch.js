@@ -38,6 +38,10 @@ function setup() {
   }
 
   video = createCapture(VIDEO, { flipped: true });
+  
+  // 修正手機端 (尤其是 iOS) 無法顯示影像的問題
+  video.elt.setAttribute('playsinline', '');
+  
   video.hide();
 
   // Start detecting hands
